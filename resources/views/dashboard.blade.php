@@ -58,22 +58,6 @@
 
             </div>
 
-            <div>
-               <x-ui.card  class="mt-6" padding="p-4">
-                    <h2 class="text-lg font-semibold">
-                        Pending Tasks
-                    </h2>
-
-                    <p class="mt-2 text-xl font-bold">
-                        5 Tasks
-                    </p>
-
-                    <p class="mt-1 text-sm text-cosmos-muted">
-                        Tasks waiting to be completed...
-                    </p>
-                </x-ui.card>
-            </div>      
-
                 <div class="grid gap-6 md:grid-cols-2">
 
                     <x-ui.card class="mt-6" padding="p-4">
@@ -101,6 +85,21 @@
                 </x-ui.card>
 
                 </div>
+                <div>
+               <x-ui.card  class="mt-6" padding="p-4">
+                    <h2 class="text-lg font-semibold">
+                        Pending Tasks
+                    </h2>
+
+                    <p class="mt-2 text-xl font-bold">
+                        5 Tasks
+                    </p>
+
+                    <p class="mt-1 text-sm text-cosmos-muted">
+                        Tasks waiting to be completed...
+                    </p>
+                </x-ui.card>
+            </div>      
         </div>
 
 @endsection
