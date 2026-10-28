@@ -7,6 +7,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+});
+
+Route::get('/tasks', function () {
+    return view('tasks');
+});
 
 Route::get('/sessions', function () {
     return view('sessions');
