@@ -11,12 +11,12 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-});
+})->name('dashboard');
 
 
 Route::get('/tasks', function () {
     return view('tasks');
-});
+})->name('tasks');
 
 
 Route::get('/sessions', [SessionController::class, 'index'])->name('sessions');

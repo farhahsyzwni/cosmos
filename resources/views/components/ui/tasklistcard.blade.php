@@ -7,7 +7,7 @@
 <article class="group relative min-w-0 pt-9">
 
     {{-- Folder tab --}}
-    <div class="absolute left-0 top-0 h-10 w-28 rounded-t-[14px] bg-[#8ECECE] transition-colors duration-200 group-hover:bg-[#A0DEDE]">
+    <div class="absolute left-0 top-2 h-12 w-28 rounded-t-[14px] bg-[#8ECECE] transition-colors duration-200 group-hover:bg-[#A0DEDE]">
     </div>
 
     {{-- Folder body --}}

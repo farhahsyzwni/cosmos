@@ -24,15 +24,15 @@
 
         <!-- Navigation -->
         <div class="flex items-center gap-8">
-            <a href="#" class="text-cosmos-muted hover:text-white">
+            <a href="{{ route('sessions') }}" class="{{ request()->is('sessions') ? 'text-white font-semibold' : 'text-cosmos-muted hover:text-white' }}">
                 Sessions
             </a>
 
-            <a href="#" class="text-cosmos-muted hover:text-white">
+            <a href="{{ route('tasks') }}" class="{{ request()->is('tasks') ? 'text-white font-semibold' : 'text-cosmos-muted hover:text-white' }}">
                 Tasks
             </a>
 
-            <a href="#" class="font-semibold text-white">
+            <a href="{{ route('dashboard') }}" class="{{ request()->is('dashboard') ? 'text-white font-semibold' : 'text-cosmos-muted hover:text-white' }}">
                 Dashboard
             </a>
         </div>

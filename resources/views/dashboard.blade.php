@@ -4,7 +4,7 @@
 
 @section('content')
    
-    <div class="mx-auto max-w-7xl">
+    <div class="mx-auto max-w-7xl px-8 py-8">
 
         <div>
             <x-ui.card class="mt-6 mb-6" padding="p-4">
@@ -17,10 +17,12 @@
                     Ready to focus?
                 </p>
 
+                <a href ="{{ route('sessions') }}">
                 <x-ui.button>
                     Start Focus Session
                 </x-ui.button>
-            </x-ui.card>
+                </x-ui.card>
+                </a>
         </div>
 
             <div class="grid gap-6 md:grid-cols-3">
