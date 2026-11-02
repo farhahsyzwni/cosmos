@@ -58,9 +58,14 @@
                     </div>
                 </form>
 
-                <p class="text-center text-sm text-white/80 mt-6">
+                <p class="text-center text-medium text-white mt-6">
                     Don't have an account? 
                     <a href="{{ route('register') }}" class="font-medium text-cosmos-blue hover:text-cosmos-aqua">Register here</a>.</p>
+                <p class="text-center ">
+                    <a href="{{ route('sessions') }}" class="font-medium text-cosmos-blue hover:text-cosmos-aqua">
+                        Continue as Guest
+                    </a>    
+                </p>
             </div>
         </div>
     </body>

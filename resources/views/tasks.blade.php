@@ -41,7 +41,7 @@
         <div class="mb-10 flex flex-col gap-5 sm:mb-[46px] sm:flex-row sm:items-center sm:justify-between">
 
             <h1 class="font-sans text-3xl font-extrabold uppercase tracking-wide sm:text-[34px]">
-                Aisyah's Task List
+                {{ auth()->user()->username }}'s Task List
             </h1>
 
             {{-- Reuse the existing UI button component --}}
