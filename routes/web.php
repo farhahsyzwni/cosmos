@@ -11,17 +11,21 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->name('dashboard');
+})->middleware('auth')->name('dashboard');
 
 
 Route::get('/tasks', function () {
     return view('tasks');
-})->name('tasks');
+})->middleware('auth')->name('tasks');
 
 
 Route::get('/sessions', [SessionController::class, 'index'])->name('sessions');
 Route::post('/sessions', [SessionController::class, 'create'])->name('sessions.create');
 Route::get('/sessions/{session_token}', [SessionController::class, 'show'])->name('sessions.show');
+Route::post('/sessions/guest/clear', function (Illuminate\Http\Request $request) {
+    $request->session()->forget('guest_session');
+    return redirect('/sessions');
+})->name('sessions.guest.clear');
 
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -30,4 +34,4 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');

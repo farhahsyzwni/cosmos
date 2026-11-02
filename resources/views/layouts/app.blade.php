@@ -39,11 +39,26 @@
 
         <!-- Profile -->
         <div class="flex items-center gap-3">
+            @auth
             <div class="h-10 w-10 rounded-full bg-cosmos-purple"></div>
-
             <span>
-                Aisyah
+                {{ auth()->user()->username }}
             </span>
+
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="text-cosmos-muted hover:text-white">
+                    Logout
+                </button>
+            </form>
+            @else
+            <a href="{{ route('login') }}" class="text-cosmos-muted hover:text-white">
+                Login
+            </a>
+            <a href="{{ route('register') }}" class="text-cosmos-muted hover:text-white">
+                Register
+            </a>
+            @endauth
         </div>
 
     </nav>

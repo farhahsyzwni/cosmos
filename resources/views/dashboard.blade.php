@@ -13,7 +13,7 @@
                 </h1>
 
                 <p class="mb-10 text-cosmos-muted">
-                    Good evening, Aisyah
+                    Good evening, {{ auth()->user()->username }}.
                     Ready to focus?
                 </p>
 
