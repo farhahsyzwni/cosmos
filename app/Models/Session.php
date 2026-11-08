@@ -23,6 +23,7 @@ class Session extends Model
         'short_break', 
         'long_break',
         'session_status',
+        'created_at',
         'ended_at',
     ];
 

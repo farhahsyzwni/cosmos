@@ -36,6 +36,7 @@ class SessionController extends Controller
                 'short_break' => $validated['short_break'],
                 'long_break' => $validated['long_break'],
                 'session_status' => 'Active',
+                'created_at' => now(),
             ]);
 
             return redirect('/sessions/' . $session->session_token);
@@ -55,5 +56,31 @@ class SessionController extends Controller
     public function show($session_token){
         $session = Session::where('session_token', $session_token)->firstOrFail();
         return view('sessions', compact('session'));
+    }
+
+    public function end(Request $request, $session_token){
+
+        //Guest session
+        if ( $session_token ==='guest' && $request->session()->has('guest_session')) {
+            
+            $request->session()->forget('guest_session');
+
+            return redirect('/sessions')
+                ->with('success', 'Session ended succesfully.');
+        }
+
+        //Authenticated session
+        $session = Session::where('session_token', $session_token)
+            ->where('host_id', auth()->id())
+            ->where('session_status', 'Active')
+            ->firstOrFail();
+
+        $session->update([
+            'session_status' => 'Ended',
+            'ended_at' => now(),
+        ]);
+
+        return redirect('/sessions')
+            ->with('success', 'Session ended succesfully.');
     }
 }

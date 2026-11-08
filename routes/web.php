@@ -26,6 +26,8 @@ Route::post('/sessions/guest/clear', function (Illuminate\Http\Request $request)
     $request->session()->forget('guest_session');
     return redirect('/sessions');
 })->name('sessions.guest.clear');
+Route::post('/sessions/{session_token}/end', [SessionController::class, 'end'])
+    ->name('sessions.end');
 
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

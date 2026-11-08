@@ -65,7 +65,7 @@
                         Focus Duration
                     </label>
 
-                    <input type="number" value="{{ $activeSession ? $session->focus_duration : 25 }}"
+                    <input type="number" id="focus-duration" value="{{ $activeSession ? $session->focus_duration : 25 }}" min="1"
                         class="mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2"
                     >
                 </div> 
@@ -75,7 +75,7 @@
                         Short Break
                     </label>
 
-                    <input type="number" value="{{ $activeSession ? $session->short_break : 5 }}"
+                    <input type="number" id="short-break" value="{{ $activeSession ? $session->short_break : 5 }}" min="1"
                         class="mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2"
                     >
                 </div>
@@ -85,14 +85,14 @@
                         Long Break
                     </label>
 
-                    <input type="number" value="{{ $activeSession ? $session->long_break : 15 }}"
+                    <input type="number" id="long-break" value="{{ $activeSession ? $session->long_break : 15 }}" min="1"
                         class="mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2"
                     >
                 </div>
 
                 <label class="flex items-center gap-3 text-sm">
-                    <input type="checkbox" class="rounded">
-                    <span>Auto-start breaks</span>
+                    <input type="checkbox" id="auto-start-next" class="rounded">
+                    <span>Auto-start next session</span>
                 </label>
 
             </div>
@@ -138,14 +138,18 @@
                             Start Session
                         </button>
 
-                        @guest
-                            <form action="{{ route('sessions.guest.clear') }}" method="POST" class="mt-3">
-                                @csrf
-                                <button type="submit" class="rounded-xl bg-red-500 px-6 py-2 font-semibold text-white hover:bg-red-700">
-                                    Leave Session
-                                </button>
-                            </form>
-                        @endguest
+                        <form
+                            action="{{ route('sessions.end', $activeSession && isset($session->session_token) ? $session->session_token : 'guest') }}"
+                            method="POST"
+                        >
+                            @csrf
+
+                            <button type = "button" 
+                                id="end-session"
+                                class = "mt-3 rounded-xl border border-white/20 px-5 py-2 text-sm transition hover:bg-white/10">
+                                End Session
+                            </button>
+                        </form>
                     @endif
                 </div>
 
@@ -250,6 +254,32 @@
         </div>
     @endif
 
+    <!-- End Session Confirmation Modal -->
+    <div id="end-session-modal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
+
+        <div class="w-full max-w-sm rounded-2xl bg-cosmos-bg p-6 shadow-2xl">
+
+            <h2 class="mb-2 text-lg font-bold">End Session?</h2>
+
+            <p class="mb-6 text-sm opacity-70">
+                Are you sure you want to end this session?
+                Your current session will be closed.
+            </p>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" id="cancel-end-session"
+                    class="rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10">
+                    Cancel
+                </button>
+                <button type="button" id="confirm-end-session"
+                    class="rounded-xl bg-cosmos-purple px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+                    End Session
+                </button>
+            </div>
+        </div>
+    </div> 
+
     <script>
         const createSessionModal = document.getElementById('create-session-modal');
         const openCreateSession = document.getElementById('open-create-session');
@@ -305,9 +335,57 @@
         const timerDisplay = document.getElementById('timer');
         const startButton = document.getElementById('start-session');
 
-        const focusDuration = {{ $activeSession ? $session->focus_duration : 25 }};
-        const shortBreakDuration = {{ $activeSession ? $session->short_break : 5 }};
-        const longBreakDuration = {{ $activeSession ? $session->long_break : 15 }};
+
+        const focusInput = document.getElementById('focus-duration');
+        const shortBreakInput = document.getElementById('short-break');
+        const longBreakInput = document.getElementById('long-break');
+        const autoStartNextInput = document.getElementById('auto-start-next');
+
+        let focusDuration = Number(focusInput.value);
+        let shortBreakDuration = Number(shortBreakInput.value);
+        let longBreakDuration = Number(longBreakInput.value);
+        let autoStartNext = autoStartNextInput.checked;
+
+        focusInput.addEventListener('change', () => {
+            const value = Number(focusInput.value);
+
+            if (value >= 1) {
+                focusDuration = value;
+                if (currentPhase === 'focus' && !isRunning) {
+                    remainingSeconds = focusDuration * 60;
+                    updateTimerDisplay();
+                }
+            } 
+        });
+
+        shortBreakInput.addEventListener('change', () => {
+            const value = Number(shortBreakInput.value);
+
+            if (value >= 1) {
+                shortBreakDuration = value;
+                if (currentPhase === 'short-break' && !isRunning) {
+                    remainingSeconds = shortBreakDuration * 60;
+                    updateTimerDisplay();
+                }
+            } 
+        });
+
+        longBreakInput.addEventListener('change', () => {
+            const value = Number(longBreakInput.value);
+
+            if (value >= 1) {
+                longBreakDuration = value;
+                if (currentPhase === 'long-break' && !isRunning) {
+                    remainingSeconds = longBreakDuration * 60;
+                    updateTimerDisplay();
+                }
+            } 
+        });
+
+        autoStartNextInput.addEventListener('change', () => {
+            autoStartNext = autoStartNextInput.checked;
+        });
+
 
         let timerInterval = null;
         let isRunning = false;
@@ -373,7 +451,16 @@
                         isRunning = false;
                         
                         setNextPhase();
-                        startTimer(); 
+
+                        if (autoStartNext) {
+                            startTimer();
+                        } else {
+                            if (currentPhase === 'focus') {
+                                startButton.textContent = 'Start Focus';
+                            } else {
+                                startButton.textContent = 'Start Break';
+                            }
+                        }
                     }
                 }, 1000);
         }
@@ -397,5 +484,32 @@
 
         updateTimerDisplay();
         updatePhaseDisplay();
+
+        // End Session Confirmation Modal
+        const endSessionModal = document.getElementById('end-session-modal');
+        const endSessionButton = document.getElementById('end-session');
+        const cancelEndSession = document.getElementById('cancel-end-session');
+        const confirmEndSession = document.getElementById('confirm-end-session');
+        const endSessionForm = endSessionButton?.closest('form');
+
+        if (endSessionButton && endSessionModal) {
+            endSessionButton.addEventListener('click', () => {
+                endSessionModal.classList.remove('hidden');
+                endSessionModal.classList.add('flex');
+            });
+        }
+
+        if (cancelEndSession){
+            cancelEndSession.addEventListener('click', () => {
+                endSessionModal.classList.add('hidden');
+                endSessionModal.classList.remove('flex');
+            });
+        }
+
+        if (confirmEndSession && endSessionForm) {
+            confirmEndSession.addEventListener('click', () => {
+                endSessionForm.submit();
+            });
+        }
     </script>
 @endsection
