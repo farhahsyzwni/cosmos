@@ -21,7 +21,9 @@ Route::get('/tasks', function () {
 
 Route::get('/sessions', [SessionController::class, 'index'])->name('sessions');
 Route::post('/sessions', [SessionController::class, 'create'])->name('sessions.create');
-Route::get('/sessions/{session_token}', [SessionController::class, 'show'])->name('sessions.show');
+Route::get('/sessions/{session_token}', [SessionController::class, 'show'])
+    ->middleware('auth')
+    ->name('sessions.show');
 Route::post('/sessions/guest/clear', function (Illuminate\Http\Request $request) {
     $request->session()->forget('guest_session');
     return redirect('/sessions');

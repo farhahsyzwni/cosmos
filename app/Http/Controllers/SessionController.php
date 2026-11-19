@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Session;
+use App\Models\SessionParticipant;
 use Illuminate\Support\Str;
 
 class SessionController extends Controller
@@ -54,7 +55,33 @@ class SessionController extends Controller
     }
 
     public function show($session_token){
-        $session = Session::where('session_token', $session_token)->firstOrFail();
+        $session = Session::with(['host', 'participants.user'])
+            ->where('session_token', $session_token)
+            ->where('session_status', 'Active')
+            ->firstOrFail();
+
+        // Check whether the authenticated user is the host
+        if (auth()->id() !== $session->host_id) {
+
+            //Add participant if they are not already in the session
+            SessionParticipant::firstOrCreate(
+                [
+                    'session_id' => $session->session_id,
+                    'user_id' => auth()->id(),
+                ],
+                [
+                    'joined_at' => now(),
+                ]
+            );
+
+            //Change session type to Collaborative
+            if ($session->session_type === 'Private') {
+                $session->update([
+                    'session_type' => 'Collaborative',
+                ]);
+            }
+        }
+
         return view('sessions', compact('session'));
     }
 

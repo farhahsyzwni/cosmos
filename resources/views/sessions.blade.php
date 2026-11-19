@@ -178,18 +178,79 @@
 
                 <!-- Session participants -->
                 <div class="py-16 text-center">
-                    <button type = "button" class = "rounded-xl border border-gray-300/20 px-6 py-1 font-medium text-white hover:bg-teal-400/60">
-                        Generate Shareable Link
-                    </button>
 
+                    @if ($activeSession && auth()->check())
+
+                        <button type = "button" id="generate-link" 
+                            class = "rounded-xl border border-gray-300/20 px-6 py-1 font-medium text-white hover:bg-teal-400/60">
+                            Generate Shareable Link
+                        </button>
+
+                        <!-- Shareable Link Display -->
+                        <div id="share-link-container" class="mt-4 hidden">
+                            <div class="mx-auto flex max-w-md items-center gap-2 rounded-xl bg-white/10 p-2">
+                                <input type="text" id="share-link" readonly
+                                    class="w-full bg-transparent px-2 text-sm text-white outline-none">
+                                <button type="button" id="copy-link"
+                                    class="rounded-xl bg-cosmos-purple px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+                                    Copy
+                                </button>
+                            </div>
+                            
+                            <p id="copy-message" class="mt-2 hidden text-sm text-green-300">Link copied!</p>
+                        </div>
+                    @endif
+
+                    <!-- Session Participants -->
                     <p class="mt-7 text-sm font-medium text-white">
                         In This Session:
                     </p>
-                    <div class="flex justify-center gap-4 mt-4">
-                        <div class="h-9 w-9 rounded-full bg-white/20"></div>
-                        <div class="h-9 w-9 rounded-full bg-white/20"></div>
-                        <div class="h-9 w-9 rounded-full bg-white/20"></div>
+
+                    <div class="flex flex-wrap justify-center gap-6 mt-4">
+
+                        @if ($activeSession)
+
+                            {{-- Host --}}
+                            @if (isset($session->host))
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-cosmos-aqua/50 font-semibold text-white">
+                                        {{ strtoupper(substr($session->host->username, 0, 1)) }}
+                                    </div>
+
+                                    <span class="text-xs text-white">
+                                        {{ $session->host->username }} 
+                                        <span class="opacity-60">(Host)</span>
+                                    </span>
+                                </div>
+
+                            @else
+                                {{-- Guest solo session --}}
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-cosmos-aqua/50 font-semibold text-white"> Y
+                                    </div>
+
+                                    <span class="text-xs text-white">You (Guest)</span>
+                                </div>
+                            @endif
+
+                            {{-- OtherParticipants --}}
+                            @foreach ($session->participants ?? [] as $participant)
+                                @if ($participant->user)
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-cosmos-aqua/50 font-semibold text-white">
+                                        {{ strtoupper(substr($participant->user->username, 0, 1)) }}
+                                    </div>
+
+                                    <span class="text-xs text-white">
+                                        {{ $participant->user->username }}
+                                    </span>
+                                </div>
+                                @endif
+                            @endforeach
+
+                        @endif
                     </div>
+
                 </div>
                 
             </section>
@@ -509,6 +570,38 @@
         if (confirmEndSession && endSessionForm) {
             confirmEndSession.addEventListener('click', () => {
                 endSessionForm.submit();
+            });
+        }
+
+        // Generate Shareable Link
+        const generateLinkButton = document.getElementById('generate-link');
+        const shareLinkContainer = document.getElementById('share-link-container');
+        const shareLinkInput = document.getElementById('share-link');
+        const copyLinkButton = document.getElementById('copy-link');
+        const copyMessage = document.getElementById('copy-message');
+
+        if (generateLinkButton) {
+            generateLinkButton.addEventListener('click', () => {
+                const sessionLink = "{{ $activeSession && isset($session->session_token) ? route('sessions.show', $session->session_token) : '' }}";
+                shareLinkInput.value = sessionLink;
+                shareLinkContainer.classList.remove('hidden');
+                generateLinkButton.textContent = 'Link Generated';
+            });
+        }
+
+        if (copyLinkButton) {
+            copyLinkButton.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(shareLinkInput.value);
+                    copyMessage.classList.remove('hidden');
+                    copyLinkButton.textContent = "Copied!";
+                } catch (error) {
+                    shareLinkInput.select();
+                    document.execCommand('copy');
+
+                    copyMessage.classList.remove('hidden');
+                    copyLinkButton.textContent = 'Copied!';
+                }
             });
         }
     </script>
